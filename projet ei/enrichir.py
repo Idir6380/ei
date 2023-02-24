@@ -6,12 +6,12 @@ lettres='abcdeéfghijklmnopqrstuvwxyz'
 f1=open(sys.argv[1],'r',encoding='UTF-8')
 
 x=f1.readlines()
-
+t=[]
 for i in x:
     reg = re.search(r'''
-    ^[-*Ø]?\s?  # Debut avec "* " ou "- "
-    (\w+)       #La substance recherchée 
-    \s:?\s?     #subts :  (GAVISCON : 1 sachet par jour.)
+    ^[-*Ø]?\s?  
+    (\w+)        
+    \s:?\s?     
     (\d+|,|\d+.\d)+
     \s?:?   
     (\s(mg\s|MG|UI|ml|mcg|amp|iu|flacon|g|sachet|un\s|1/j|/j)(.+|\n)|(g|/j)\n|(mg)\s.+)
@@ -24,10 +24,19 @@ for i in x:
                 and reg.group(1).lower() != 'aspegic'  \
                 and reg.group(1).lower() != 'kt' \
                 and reg.group(1).lower() != 'le' \
+                and reg.group(1).lower() != 'b1'\
+                and reg.group(1).lower() != 'intraveineuse'\
+                and reg.group(1).lower() != 'nfs'\
+                and reg.group(1).lower() != 'oxygène'\
                 and reg.group(1).lower() != 'puis':
                 extrait.append(reg.group(1).lower()+',.N+subst'+'\n')
+for i in x:
+    reg=re.search('((vitamine|VITAMINE|Vitamine) [A-Za-b](\d| \d)*)',i)
+    if reg:
+        extrait.append(reg.group(1).lower()+',.N+subst'+'\n')
 f1.close()
 print(len(extrait))
+extrait = sorted(list(set(extrait)))
 #creation subst_corpus.dic
 p=open('subst_corpus.dic','w',encoding='UTF-16 LE') 
 p.write('\ufeff')  
